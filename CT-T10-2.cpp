@@ -103,49 +103,33 @@ void nhap(Folder& folder) {
 
 void del(Folder& folder) {
     if (!folder.head) {
-        cout << "Danh sách r?ng, không có file ð? xóa.\n";
+        cout << "Danh sach rong.\n";
         return;
     }
-
     FileNode* maxFile = folder.head;
-    FileNode* p = 0;
+    FileNode* prevMax = 0;
+    FileNode* prev = 0;
     FileNode* current = folder.head;
-    while (current->next) {
-        p = current;
-        current = current->next;
-    }
-    maxFile = current;
-
-    FileNode* t = 0;
-    current = folder.head;
-    while (current && current->fileSize == maxFile->fileSize) {
-        if (!t ||
-            (current->h > t->h) || 
-            (current->h == t->h && current->m > t->m) || 
-            (current->h == t->h && current->m == t->m && current->s > t->s)) {
-            t = current;
+    while (current) {
+        if (current->fileSize > maxFile->fileSize ||
+            (current->fileSize == maxFile->fileSize && 
+            (current->h < maxFile->h || 
+            (current->h == maxFile->h && current->m < maxFile->m) || 
+            (current->h == maxFile->h && current->m == maxFile->m && current->s < maxFile->s)))) {
+            maxFile = current;
+            prevMax = prev;
         }
-        p = current;
+        prev = current;
         current = current->next;
     }
 
-    if (t == folder.head) {
-        folder.head = folder.head->next; 
-    } else {
-        current = folder.head;
-        FileNode* pt = 0;
-
-        while (current && current != t) {
-            pt = current;
-            current = current->next;
-        }
-
-        if (pt) {
-            pt->next = t->next; 
-        }
+    if (maxFile == folder.head) {
+        folder.head = folder.head->next;
+    } else if (prevMax) {
+        prevMax->next = maxFile->next;
     }
 
-    delete t;
+    delete maxFile;
 }
 
 
